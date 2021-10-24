@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Url;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,7 +29,7 @@ Route::get('urls', function () {
 Route::get('urls/{id}', function (Request $request, Response $response, $id) {
     $url = Url::find($id);
     return view('url', ['url' => $url]);
-});
+})->name('getUrl');
 
 Route::post('urls', function (Request $request) {
     $urlValidator = Validator::make(
@@ -50,12 +51,12 @@ Route::post('urls', function (Request $request) {
     if ($nameValidator->fails()) {
         flash('Страница уже существует')->info();
 
-        $url = Url::where('name', $name)->get();
-        return redirect()->route('urls', [$url]);
+        $url = Url::where('name', $name)->first();
+        return redirect()->route('getUrl', [$url]);
     }
 
     $url = new Url();
     $url->name = $name;
     $url->save();
-    return redirect()->route('urls', [$url]);
+    return redirect()->route('getUrl', [$url]);
 });

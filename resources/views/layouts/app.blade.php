@@ -23,10 +23,10 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" href="{{ url('/') }}">Главная</a>
+            <a class="nav-link {{ Request::is('/') ? 'active' : '' }}" href="{{ url('/') }}">Главная</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link " href="{{ url('/urls') }}">Сайты</a>
+            <a class="nav-link {{ Request::is('urls') ? 'active' : '' }}" href="{{ url('/urls') }}">Сайты</a>
           </li>
         </ul>
       </div>

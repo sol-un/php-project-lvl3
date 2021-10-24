@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="container-lg">
-  <h1 class="mt-5 mb-3">Сайт: {{ $url['name'] }}</h1>
+  <div class="mt-3">
+    @include('flash::message')
+  </div>
+  <h1 class="mt-4 mb-3">Сайт: {{ $url['name'] }}</h1>
   <div class="table-responsive">
     <table class="table table-bordered table-hover text-nowrap">
       <tr>
