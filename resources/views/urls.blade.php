@@ -12,7 +12,7 @@
       @foreach($urls as $url)
       <tr>
         <td>{{ $url['id'] }}</td>
-        <td><a href="{{ url('urls', $url['id']) }}">{{ $url['name'] }}</a></td>
+        <td><a href="{{ route('urls.show', [$url]) }}">{{ $url['name'] }}</a></td>
       </tr>
       @endforeach
     </table>

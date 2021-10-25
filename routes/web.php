@@ -19,44 +19,43 @@ use App\Models\Url;
 
 Route::get('/', function () {
     return view('main');
-});
+})->name('main');
 
 Route::get('urls', function () {
     $urls = Url::all();
     return view('urls', ['urls' => $urls]);
-});
+})->name('urls.index');
 
 Route::get('urls/{id}', function (Request $request, Response $response, $id) {
-    $url = Url::find($id);
+    $url = Url::findOrFail($id);
     return view('url', ['url' => $url]);
-})->name('getUrl');
+})->name('urls.show');
 
 Route::post('urls', function (Request $request) {
+    $url = $request['url']['name'];
     $urlValidator = Validator::make(
-        ['url' => $request['url']['name']],
+        ['url' => $url],
         ['url' => 'required|url|max:255']
     );
     if ($urlValidator->fails()) {
         flash('Некорректный URL')->error();
-
         return redirect('/');
     }
 
-    ['scheme' => $scheme, 'host' => $host] = parse_url($request['url']['name']);
+    ['scheme' => $scheme, 'host' => $host] = parse_url($url);
     $name = $scheme . '://' . $host;
     $nameValidator = Validator::make(
         ['name'  => $name],
         ['name' => 'unique:urls']
     );
     if ($nameValidator->fails()) {
-        flash('Страница уже существует')->info();
-
         $url = Url::where('name', $name)->first();
-        return redirect()->route('getUrl', [$url]);
+        flash('Страница уже существует')->info();
+        return redirect()->route('urls.show', [$url]);
     }
 
     $url = new Url();
     $url->name = $name;
     $url->save();
-    return redirect()->route('getUrl', [$url]);
-});
+    return redirect()->route('urls.show', [$url]);
+})->name('urls.store');

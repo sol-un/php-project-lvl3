@@ -8,6 +8,9 @@ setup:
 	php artisan migrate
 	npm install
 
+test:
+	php artisan test
+
 deploy:
 	git push heroku main
 
