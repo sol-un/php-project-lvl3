@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Http;
 use App\Models\Url;
 
 class ApplicationTest extends TestCase
@@ -48,12 +49,25 @@ class ApplicationTest extends TestCase
 
     public function testCheck(): void
     {
-        $urlid = 1;
-        $data = ['id' => $urlid];
-        $response = $this->post(route('urls.check', $data));
+        $name = 'https://www.example.com';
+        $status = 200;
+
+        Http::fake([
+            $name => Http::response($status),
+        ]);
+
+        $url = new Url();
+        $url->name = $name;
+        $url->save();
+
+        $response = $this->post(route('urls.check', $url));
         $response->assertSessionHasNoErrors();
         $response->assertRedirect();
 
-        $this->assertDatabaseHas('url_checks', ['url_id' => $urlid]);
+        $data = [
+            'url_id' => $url['id'],
+            'status_code' => $status
+        ];
+        $this->assertDatabaseHas('url_checks', $data);
     }
 }

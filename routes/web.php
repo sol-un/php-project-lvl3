@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Models\Url;
 use App\Models\UrlCheck;
@@ -30,6 +31,7 @@ Route::get('urls', function () {
                 ->orderBy('created_at', 'desc')
                 ->first();
             $url['last_check_date'] = $lastcheck['created_at'] ?? null;
+            $url['status_code'] = $lastcheck['status_code'] ?? null;
             return $url;
         });
     return view('urls', compact('urls'));
@@ -73,8 +75,12 @@ Route::post('urls', function (Request $request) {
 })->name('urls.store');
 
 Route::post('urls/{id}/checks', function ($id) {
+    $url = Url::findOrFail($id);
+    $response = Http::get($url['name']);
+
     $urlcheck = new UrlCheck();
     $urlcheck->url_id = $id;
+    $urlcheck->status_code = $response->status();
     $urlcheck->save();
     return redirect()->route('urls.show', ['id' => $id]);
 })->name('urls.check');
