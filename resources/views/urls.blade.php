@@ -8,11 +8,13 @@
       <tr>
         <th>ID</th>
         <th>Имя</th>
+        <th>Последняя проверка</th>
       </tr>
       @foreach($urls as $url)
       <tr>
         <td>{{ $url['id'] }}</td>
         <td><a href="{{ route('urls.show', [$url]) }}">{{ $url['name'] }}</a></td>
+        <td>{{ $url['last_check_date'] }}</td>
       </tr>
       @endforeach
     </table>

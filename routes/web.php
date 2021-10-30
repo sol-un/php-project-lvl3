@@ -2,9 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Models\Url;
+use App\Models\UrlCheck;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,13 +23,24 @@ Route::get('/', function () {
 })->name('main');
 
 Route::get('urls', function () {
-    $urls = Url::all();
-    return view('urls', ['urls' => $urls]);
+    $urls = collect(Url::all())
+        ->map(function ($url) {
+            $id = $url['id'];
+            $lastcheck = UrlCheck::where('url_id', $id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            $url['last_check_date'] = $lastcheck['created_at'] ?? null;
+            return $url;
+        });
+    return view('urls', compact('urls'));
 })->name('urls.index');
 
-Route::get('urls/{id}', function (Request $request, Response $response, $id) {
+Route::get('urls/{id}', function ($id) {
     $url = Url::findOrFail($id);
-    return view('url', ['url' => $url]);
+    $checks = UrlCheck::where('url_id', $id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+    return view('url', compact('url', 'checks'));
 })->name('urls.show');
 
 Route::post('urls', function (Request $request) {
@@ -59,3 +71,10 @@ Route::post('urls', function (Request $request) {
     $url->save();
     return redirect()->route('urls.show', [$url]);
 })->name('urls.store');
+
+Route::post('urls/{id}/checks', function ($id) {
+    $urlcheck = new UrlCheck();
+    $urlcheck->url_id = $id;
+    $urlcheck->save();
+    return redirect()->route('urls.show', ['id' => $id]);
+})->name('urls.check');

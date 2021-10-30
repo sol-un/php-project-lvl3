@@ -45,4 +45,15 @@ class ApplicationTest extends TestCase
 
         $this->assertDatabaseHas('urls', $data['url']);
     }
+
+    public function testCheck(): void
+    {
+        $urlid = 1;
+        $data = ['id' => $urlid];
+        $response = $this->post(route('urls.check', $data));
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('url_checks', ['url_id' => $urlid]);
+    }
 }

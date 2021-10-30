@@ -18,4 +18,4 @@ lint:
 	composer exec --verbose phpcs -- --standard=PSR12 routes
 
 migrate-redo:
-	php artisan migrate:rollback && php artisan migrate
+	php artisan migrate:reset && php artisan migrate
