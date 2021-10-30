@@ -20,33 +20,33 @@ use DiDom\Document;
 |
 */
 
-Route::get('/', function () {
+Route::get('/', function (): Illuminate\View\View {
     return view('main');
 })->name('main');
 
-Route::get('urls', function () {
+Route::get('urls', function (): Illuminate\View\View {
     $urls = collect(Url::all())
-        ->map(function ($url) {
+        ->map(function ($url): App\Models\Url {
             $id = $url['id'];
-            $lastcheck = UrlCheck::where('url_id', $id)
-                ->orderBy('created_at', 'desc')
+            $lastcheck = UrlCheck::orderBy('created_at', 'desc')
+                ->where('url_id', $id)
                 ->first();
-            $url['last_check_date'] = $lastcheck['created_at'] ?? null;
-            $url['status_code'] = $lastcheck['status_code'] ?? null;
+            $url['last_check_date'] = optional($lastcheck)->created_at;
+            $url['status_code'] = optional($lastcheck)->status_code;
             return $url;
         });
     return view('urls', compact('urls'));
 })->name('urls.index');
 
-Route::get('urls/{id}', function ($id) {
+Route::get('urls/{id}', function ($id): Illuminate\View\View {
     $url = Url::findOrFail($id);
-    $checks = UrlCheck::where('url_id', $id)
-        ->orderBy('created_at', 'desc')
+    $checks = UrlCheck::orderBy('created_at', 'desc')
+        ->where('url_id', $id)
         ->get();
     return view('url', compact('url', 'checks'));
 })->name('urls.show');
 
-Route::post('urls', function (Request $request) {
+Route::post('urls', function (Request $request): Illuminate\Http\RedirectResponse {
     $url = $request['url']['name'];
     $urlValidator = Validator::make(
         ['url' => $url],
@@ -54,7 +54,7 @@ Route::post('urls', function (Request $request) {
     );
     if ($urlValidator->fails()) {
         flash('Некорректный URL')->error();
-        return redirect('/');
+        return redirect('/')->withErrors($urlValidator);
     }
 
     ['scheme' => $scheme, 'host' => $host] = parse_url($url);
@@ -75,9 +75,10 @@ Route::post('urls', function (Request $request) {
     return redirect()->route('urls.show', [$url]);
 })->name('urls.store');
 
-Route::post('urls/{id}/checks', function ($id) {
+Route::post('urls/{id}/checks', function ($id): Illuminate\Http\RedirectResponse {
+    /** @var \App\Models\Url $url */
     $url = Url::findOrFail($id);
-    $response = Http::get($url['name']);
+    $response = Http::get($url->name);
 
     $document = new Document($response->body());
     $header = optional($document->first('h1'))->text();

@@ -47,13 +47,20 @@ class ApplicationTest extends TestCase
         $this->assertDatabaseHas('urls', $data['url']);
     }
 
+    public function testStoreValidationEmptyError(): void
+    {
+        $data = ['url' => ['name' => '']];
+        $response = $this->post(route('urls.store'), $data);
+        $response->assertSessionHasErrors();
+    }
+
     public function testCheck(): void
     {
         $name = 'https://www.example.com';
         $status = 200;
 
         Http::fake([
-            $name => Http::response($status),
+            $name => Http::response('body', $status),
         ]);
 
         $url = new Url();
