@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Models\Url;
 use App\Models\UrlCheck;
+use DiDom\Document;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,9 +79,17 @@ Route::post('urls/{id}/checks', function ($id) {
     $url = Url::findOrFail($id);
     $response = Http::get($url['name']);
 
+    $document = new Document($response->body());
+    $header = optional($document->first('h1'))->text();
+    $keywords = optional($document->first('meta[name="keywords"]'))->attr('content');
+    $description = optional($document->first('meta[name="description"]'))->attr('content');
+
     $urlcheck = new UrlCheck();
     $urlcheck->url_id = $id;
     $urlcheck->status_code = $response->status();
+    $urlcheck->h1 = $header;
+    $urlcheck->keywords = $keywords;
+    $urlcheck->description = $description;
     $urlcheck->save();
     return redirect()->route('urls.show', ['id' => $id]);
 })->name('urls.check');
