@@ -4,11 +4,13 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use App\Models\Url;
 
 class ApplicationTest extends TestCase
 {
+    private $dummyName = 'https://www.example.com';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -29,17 +31,15 @@ class ApplicationTest extends TestCase
 
     public function testShow(): void
     {
-        $url = new Url();
-        $url->name = 'https://www.example.com';
-        $url->save();
+        $id = DB::table('urls')->insertGetId(['name' => $this->dummyName]);
 
-        $response = $this->get(route('urls.show', [$url]));
+        $response = $this->get(route('urls.show', ['id' => $id]));
         $response->assertOk();
     }
 
     public function testStore(): void
     {
-        $data = ['url' => ['name' => 'https://www.example.com']];
+        $data = ['url' => ['name' => $this->dummyName]];
         $response = $this->post(route('urls.store'), $data);
         $response->assertSessionHasNoErrors();
         $response->assertRedirect();
@@ -56,23 +56,21 @@ class ApplicationTest extends TestCase
 
     public function testCheck(): void
     {
-        $name = 'https://www.example.com';
+        $name = $this->dummyName;
         $status = 200;
 
         Http::fake([
             $name => Http::response('body', $status),
         ]);
 
-        $url = new Url();
-        $url->name = $name;
-        $url->save();
+        $id = DB::table('urls')->insertGetId(['name' => $this->dummyName]);
 
-        $response = $this->post(route('urls.check', $url));
+        $response = $this->post(route('urls.check', ['id' => $id]));
         $response->assertSessionHasNoErrors();
         $response->assertRedirect();
 
         $data = [
-            'url_id' => $url['id'],
+            'url_id' => $id,
             'status_code' => $status
         ];
         $this->assertDatabaseHas('url_checks', $data);

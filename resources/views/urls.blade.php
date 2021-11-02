@@ -13,10 +13,10 @@
       </tr>
       @foreach($urls as $url)
       <tr>
-        <td>{{ $url['id'] }}</td>
-        <td><a href="{{ route('urls.show', [$url]) }}">{{ $url['name'] }}</a></td>
-        <td>{{ $url['last_check_date'] }}</td>
-        <td>{{ $url['status_code'] }}</td>
+        <td>{{ $url->id }}</td>
+        <td><a href="{{ route('urls.show', ['id' => $url->id]) }}">{{ $url->name }}</a></td>
+        <td>{{ $url->last_check_date }}</td>
+        <td>{{ $url->status_code }}</td>
       </tr>
       @endforeach
     </table>
