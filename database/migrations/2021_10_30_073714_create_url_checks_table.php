@@ -18,7 +18,7 @@ class CreateUrlChecksTable extends Migration
             $table->integer('url_id');
             $table->integer('status_code')->nullable();
             $table->string('h1')->nullable();
-            $table->string('keywords')->nullable();
+            $table->string('title')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
         });

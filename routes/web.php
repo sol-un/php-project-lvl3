@@ -83,14 +83,14 @@ Route::post('urls/{id}/checks', function ($id): Illuminate\Http\RedirectResponse
 
     $document = new Document($response->body());
     $header = optional($document->first('h1'))->text();
-    $keywords = optional($document->first('meta[name="keywords"]'))->attr('content');
+    $title = optional($document->first('title'))->text();
     $description = optional($document->first('meta[name="description"]'))->attr('content');
 
     DB::table('url_checks')->insert([
         'url_id' => $id,
         'status_code' => $response->status(),
         'h1' => $header,
-        'keywords' => $keywords,
+        'title' => $title,
         'description' => $description,
         "created_at" =>  \Carbon\Carbon::now(),
         "updated_at" => \Carbon\Carbon::now(),
