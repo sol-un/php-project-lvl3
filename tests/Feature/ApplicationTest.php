@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Http;
 
 class ApplicationTest extends TestCase
 {
-    private $dummyName = 'https://www.example.com';
+    private string $dummyName = 'https://www.example.com';
 
     protected function setUp(): void
     {

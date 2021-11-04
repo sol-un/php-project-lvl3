@@ -13,11 +13,11 @@ Route::get('/', function (): Illuminate\View\View {
 })->name('main');
 
 Route::get('urls', function (): Illuminate\View\View {
-    $urls = collect(DB::Table('urls')->get())
+    $urls = collect(DB::table('urls')->get())
         ->map(function ($url) {
             $id = $url->id;
 
-            $lastcheck = DB::Table('url_checks')
+            $lastcheck = DB::table('url_checks')
                 ->orderBy('created_at', 'desc')
                 ->where('url_id', $id)
                 ->first();
@@ -31,9 +31,9 @@ Route::get('urls', function (): Illuminate\View\View {
 })->name('urls.index');
 
 Route::get('urls/{id}', function ($id): Illuminate\View\View {
-    $url = DB::Table('urls')->find($id);
+    $url = DB::table('urls')->find($id);
 
-    $checks = DB::Table('url_checks')
+    $checks = DB::table('url_checks')
         ->orderBy('created_at', 'desc')
         ->where('url_id', $id)
         ->get();
@@ -63,7 +63,8 @@ Route::post('urls', function (Request $request): Illuminate\Http\RedirectRespons
     );
 
     if ($nameValidator->fails()) {
-        $url = DB::Table('urls')->where('name', $name)->first();
+        /** @var mixed $url */
+        $url = DB::table('urls')->where('name', $name)->first();
         flash('Страница уже существует')->info();
         return redirect()->route('urls.show', ['id' => $url->id]);
     }
@@ -78,7 +79,7 @@ Route::post('urls', function (Request $request): Illuminate\Http\RedirectRespons
 })->name('urls.store');
 
 Route::post('urls/{id}/checks', function ($id): Illuminate\Http\RedirectResponse {
-    $url = DB::Table('urls')->find($id);
+    $url = DB::table('urls')->find($id);
     $response = Http::get($url->name);
 
     $document = new Document($response->body());
