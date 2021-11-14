@@ -15,7 +15,7 @@ deploy:
 	git push heroku main
 
 lint:
-	composer exec --verbose phpcs -- --standard=PSR12 routes
+	phpcs
 
 migrate-redo:
 	php artisan migrate:reset && php artisan migrate
