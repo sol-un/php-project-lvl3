@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -15,7 +14,6 @@ class UrlChecksTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Artisan::call('migrate');
 
         $this->dummyName = 'https://www.example.com';
         $this->id = DB::table('urls')->insertGetId(['name' => $this->dummyName]);
