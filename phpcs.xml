@@ -2,6 +2,8 @@
 <ruleset name="Laravel">
     <description>PSR12 Laravel standards.</description>
 
+    <rule ref="PSR12"/>
+
     <arg name="basepath" value="."/>
     <arg name="colors"/>
     <arg name="parallel" value="100"/>

@@ -15,7 +15,7 @@ deploy:
 	git push heroku main
 
 lint:
-	phpcs
+	composer phpcs
 
 migrate-redo:
 	php artisan migrate:reset && php artisan migrate

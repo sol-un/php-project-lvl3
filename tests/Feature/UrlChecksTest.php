@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
-class UrlCheckTest extends TestCase
+class UrlChecksTest extends TestCase
 {
     private string $dummyName;
     private int $id;
