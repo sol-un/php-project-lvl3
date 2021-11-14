@@ -23,7 +23,7 @@ class UrlChecksTest extends TestCase
 
     public function testCheck(): void
     {
-        $html = file_get_contents(__DIR__ . "/../fixtures/example.html");
+        $html = (string) file_get_contents(__DIR__ . "/../fixtures/example.html");
 
         Http::fake([
             $this->dummyName => Http::response($html),
