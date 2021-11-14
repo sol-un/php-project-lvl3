@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -13,32 +12,26 @@ Route::get('/', function (): Illuminate\View\View {
 })->name('main');
 
 Route::get('urls', function (): Illuminate\View\View {
-    $urls = collect(DB::table('urls')->get())
-        ->map(function ($url) {
-            $id = $url->id;
+    $urls = DB::table('urls')->get();
 
-            $lastcheck = DB::table('url_checks')
-                ->orderBy('created_at', 'desc')
-                ->where('url_id', $id)
-                ->first();
+    $lastChecks = DB::table('url_checks')
+        ->orderBy('created_at')
+        ->get()
+        ->keyBy('url_id');
 
-            $url->last_check_date = optional($lastcheck)->created_at;
-            $url->status_code = optional($lastcheck)->status_code;
-
-            return $url;
-        });
-    return view('urls', compact('urls'));
+    return view('urls.index', compact('urls', 'lastChecks'));
 })->name('urls.index');
 
 Route::get('urls/{id}', function ($id): Illuminate\View\View {
     $url = DB::table('urls')->find($id);
+    abort_unless($url, 404);
 
     $checks = DB::table('url_checks')
         ->orderBy('created_at', 'desc')
         ->where('url_id', $id)
         ->get();
 
-    return view('url', compact('url', 'checks'));
+    return view('urls.show', compact('url', 'checks'));
 })->name('urls.show');
 
 Route::post('urls', function (Request $request): Illuminate\Http\RedirectResponse {
@@ -81,6 +74,11 @@ Route::post('urls', function (Request $request): Illuminate\Http\RedirectRespons
 Route::post('urls/{id}/checks', function ($id): Illuminate\Http\RedirectResponse {
     $url = DB::table('urls')->find($id);
     $response = Http::get($url->name);
+
+    if ($response->failed()) {
+        flash('Не удалось установить соединение')->error();
+        return redirect()->route('urls.show', ['id' => $id]);
+    }
 
     $document = new Document($response->body());
     $header = optional($document->first('h1'))->text();
