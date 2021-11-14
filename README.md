@@ -1,3 +1,4 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/31b9abe6e6ca27b2a079/maintainability)](https://codeclimate.com/github/sol-un/php-project-lvl3/maintainability)
 [![PHP CI Status](https://github.com/sol-un/php-project-lvl3/actions/workflows/workflow.yml/badge.svg)](https://github.com/sol-un/php-project-lvl2/actions/workflows/workflow.yml)
 [![Actions Status](https://github.com/sol-un/php-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/sol-un/php-project-lvl3/actions)
 
