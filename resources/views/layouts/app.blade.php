@@ -3,14 +3,8 @@
 
 <head>
   <title>Анализатор страниц</title>
-  @env('local')
   <link href="{{ asset('css/app.css') }}" rel="stylesheet" type="text/css">
   <script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
-  @endenv
-  @env('production')
-  <link href="{{ secure_asset('css/app.css') }}" rel="stylesheet" type="text/css">
-  <script type="text/javascript" src="{{ secure_asset('js/app.js') }}"></script>
-  @endenv
 </head>
 
 <body class="min-vh-100 d-flex flex-column">
