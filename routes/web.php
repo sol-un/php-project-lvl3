@@ -53,7 +53,7 @@ Route::post('urls', function (Request $request): Illuminate\Http\RedirectRespons
     $name = $scheme . '://' . $host;
 
     $url = DB::table('urls')->where('name', $name)->first();
-    if (!$url) {
+    if ($url === null) {
         $id = DB::table('urls')->insertGetId([
             'name' => $name,
             "created_at" => Carbon::now(),

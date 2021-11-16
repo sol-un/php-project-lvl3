@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
-function getFixturePath($filename)
+function getFixturePath(string $filename): string
 {
     return implode('/', [__DIR__, '..', 'fixtures', $filename]);
 }
@@ -30,7 +30,7 @@ class UrlChecksTest extends TestCase
         $fixturePath = getFixturePath('example.html');
         $html = file_get_contents($fixturePath);
 
-        if (!$html) {
+        if ($html === false) {
             throw new Exception("File not found at {$fixturePath}");
         }
 

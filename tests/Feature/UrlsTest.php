@@ -54,6 +54,6 @@ class UrlsTest extends TestCase
     {
         $data = ['url' => ['name' => $this->dummyName]];
         $response = $this->post(route('urls.store'), $data);
-        $response->assertRedirectContains($this->id);
+        $response->assertRedirectContains((string) $this->id);
     }
 }
