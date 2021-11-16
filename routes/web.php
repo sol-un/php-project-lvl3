@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use DiDom\Document;
+use Carbon\Carbon;
 
 Route::get('/', function (): Illuminate\View\View {
     return view('main');
@@ -50,23 +51,18 @@ Route::post('urls', function (Request $request): Illuminate\Http\RedirectRespons
 
     ['scheme' => $scheme, 'host' => $host] = parse_url($url);
     $name = $scheme . '://' . $host;
-    $nameValidator = Validator::make(
-        ['name'  => $name],
-        ['name' => 'unique:urls']
-    );
 
-    if ($nameValidator->fails()) {
-        /** @var mixed $url */
-        $url = DB::table('urls')->where('name', $name)->first();
+    $url = DB::table('urls')->where('name', $name)->first();
+    if (!$url) {
+        $id = DB::table('urls')->insertGetId([
+            'name' => $name,
+            "created_at" => Carbon::now(),
+            "updated_at" => Carbon::now(),
+        ]);
+    } else {
         flash('Страница уже существует')->info();
-        return redirect()->route('urls.show', ['id' => $url->id]);
+        $id = $url->id;
     }
-
-    $id = DB::table('urls')->insertGetId([
-        'name' => $name,
-        "created_at" =>  \Carbon\Carbon::now(),
-        "updated_at" => \Carbon\Carbon::now(),
-    ]);
 
     return redirect()->route('urls.show', ['id' => $id]);
 })->name('urls.store');
@@ -91,8 +87,8 @@ Route::post('urls/{id}/checks', function ($id): Illuminate\Http\RedirectResponse
         'h1' => $header,
         'title' => $title,
         'description' => $description,
-        "created_at" =>  \Carbon\Carbon::now(),
-        "updated_at" => \Carbon\Carbon::now(),
+        "created_at" => Carbon::now(),
+        "updated_at" => Carbon::now(),
     ]);
 
     return redirect()->route('urls.show', ['id' => $id]);
