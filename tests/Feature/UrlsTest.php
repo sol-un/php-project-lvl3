@@ -35,7 +35,7 @@ class UrlsTest extends TestCase
 
     public function testStore(): void
     {
-        $data = ['url' => ['name' => $this->dummyName]];
+        $data = ['url' => ['name' => 'https://www.example2.com']];
         $response = $this->post(route('urls.store'), $data);
         $response->assertSessionHasNoErrors();
         $response->assertRedirect();
@@ -43,10 +43,17 @@ class UrlsTest extends TestCase
         $this->assertDatabaseHas('urls', $data['url']);
     }
 
-    public function testStoreValidationEmptyError(): void
+    public function testStoreEmptyError(): void
     {
         $data = ['url' => ['name' => '']];
         $response = $this->post(route('urls.store'), $data);
         $response->assertSessionHasErrors();
+    }
+
+    public function testStoreDuplicate(): void
+    {
+        $data = ['url' => ['name' => $this->dummyName]];
+        $response = $this->post(route('urls.store'), $data);
+        $response->assertRedirectContains($this->id);
     }
 }

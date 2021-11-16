@@ -2,10 +2,16 @@
 
 namespace Tests\Feature;
 
+use Exception;
 use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
+function getFixturePath($filename)
+{
+    return implode('/', [__DIR__, '..', 'fixtures', $filename]);
+}
 class UrlChecksTest extends TestCase
 {
     private string $dummyName;
@@ -21,7 +27,12 @@ class UrlChecksTest extends TestCase
 
     public function testCheck(): void
     {
-        $html = (string) file_get_contents(__DIR__ . "/../fixtures/example.html");
+        $fixturePath = getFixturePath('example.html');
+        $html = file_get_contents($fixturePath);
+
+        if (!$html) {
+            throw new Exception("File not found at {$fixturePath}");
+        }
 
         Http::fake([
             $this->dummyName => Http::response($html),
@@ -37,6 +48,7 @@ class UrlChecksTest extends TestCase
             'h1' => 'Example Header',
             'title' => 'Document',
             'description' => 'Example description',
+            'created_at' => Carbon::now()
         ];
         $this->assertDatabaseHas('url_checks', $data);
     }
