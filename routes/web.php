@@ -49,8 +49,8 @@ Route::post('urls', function (Request $request): Illuminate\Http\RedirectRespons
             ->withErrors($urlValidator);
     }
 
-    ['scheme' => $scheme, 'host' => $host] = parse_url($url);
-    $name = $scheme . '://' . $host;
+    $parsedUrl = parse_url($url);
+    $name = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
 
     $url = DB::table('urls')->where('name', $name)->first();
     if ($url === null) {
@@ -67,7 +67,7 @@ Route::post('urls', function (Request $request): Illuminate\Http\RedirectRespons
     return redirect()->route('urls.show', ['id' => $id]);
 })->name('urls.store');
 
-Route::post('urls/{id}/checks', function ($id) { // : Illuminate\Http\RedirectResponse {
+Route::post('urls/{id}/checks', function ($id): Illuminate\Http\RedirectResponse {
     $url = DB::table('urls')->find($id);
     abort_unless($url, 404);
 
