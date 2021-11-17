@@ -67,12 +67,17 @@ Route::post('urls', function (Request $request): Illuminate\Http\RedirectRespons
     return redirect()->route('urls.show', ['id' => $id]);
 })->name('urls.store');
 
-Route::post('urls/{id}/checks', function ($id): Illuminate\Http\RedirectResponse {
+Route::post('urls/{id}/checks', function ($id) { // : Illuminate\Http\RedirectResponse {
     $url = DB::table('urls')->find($id);
-    $response = Http::get($url->name);
+    abort_unless($url, 404);
 
-    if ($response->failed()) {
-        flash('Не удалось установить соединение')->error();
+    $response = Http::get($url->name);
+    if ($response->clientError()) {
+        flash('Ошибка на стороне клиента')->error();
+        return redirect()->route('urls.show', ['id' => $id]);
+    }
+    if ($response->serverError()) {
+        flash('Ошибка на стороне сервера')->error();
         return redirect()->route('urls.show', ['id' => $id]);
     }
 
