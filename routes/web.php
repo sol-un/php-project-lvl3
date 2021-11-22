@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Http\Client\HttpClientException;
+use Illuminate\Http\Client\RequestException;
 use DiDom\Document;
 use Carbon\Carbon;
 
@@ -55,7 +57,7 @@ Route::post('urls', function (Request $request): Illuminate\Http\RedirectRespons
     $url = DB::table('urls')->where('name', $name)->first();
     if ($url === null) {
         $id = DB::table('urls')->insertGetId([
-            'name' => $name,
+            'name' => strtolower($name),
             "created_at" => Carbon::now(),
             "updated_at" => Carbon::now(),
         ]);
@@ -71,13 +73,10 @@ Route::post('urls/{id}/checks', function ($id): Illuminate\Http\RedirectResponse
     $url = DB::table('urls')->find($id);
     abort_unless($url, 404);
 
-    $response = Http::get($url->name);
-    if ($response->clientError()) {
-        flash('Ошибка на стороне клиента')->error();
-        return redirect()->route('urls.show', ['id' => $id]);
-    }
-    if ($response->serverError()) {
-        flash('Ошибка на стороне сервера')->error();
+    try {
+        $response = Http::get($url->name)->throw();
+    } catch (HttpClientException | RequestException $exception) {
+        flash($exception->getMessage())->error();
         return redirect()->route('urls.show', ['id' => $id]);
     }
 
